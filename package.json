@@ -1,0 +1,23 @@
+{
+  "name": "immutable-guestbook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "node": "npx hardhat node",
+    "deploy": "npx hardhat run deployment/deploy.js --network localhost",
+    "accounts": "node scripts/show-accounts.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "hardhat": "^2.22.0"
+  },
+  "dependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "dotenv": "^17.2.3",
+    "ethers": "^5.8.0"
+  }
+}
