@@ -27,21 +27,13 @@ function renderActiveAccount(address) {
   const short = address.slice(0, 6) + "..." + address.slice(-4);
 
   el.innerText = short;
-  el.style.cursor = "pointer";
-  el.title = "Klik untuk menyalin wallet address";
+  el.style.cursor = "default";
+  el.title = "Wallet address tidak dapat dicopy";
 
   document.getElementById("activeAvatar").src =
     `https://api.dicebear.com/7.x/identicon/svg?seed=${address}`;
 
-  el.onclick = async () => {
-    await navigator.clipboard.writeText(address);
-    el.innerText = "Copied!";
-    el.classList.add("text-green-400");
-    setTimeout(() => {
-      el.innerText = short;
-      el.classList.remove("text-green-400");
-    }, 1200);
-  };
+  el.onclick = null;
 }
 
 // ===============================
@@ -113,11 +105,9 @@ async function loadFeed() {
       <div class="flex items-center px-4 py-3 gap-3">
         <img src="${avatar}" class="w-10 h-10 rounded-full">
         <div class="flex-1">
-          <p class="text-sm font-mono copy-user cursor-pointer text-purple-400"
-             data-address="${msg.sender}"
-             title="Klik untuk menyalin address">
-            ${shortUser}
-          </p>
+          <p class="text-sm font-mono text-purple-400 select-none">
+  ${shortUser}
+</p>
           <p class="text-xs text-gray-400">${date}</p>
         </div>
         <span class="text-[10px] px-2 py-1 rounded-full bg-purple-600 text-black font-bold">
