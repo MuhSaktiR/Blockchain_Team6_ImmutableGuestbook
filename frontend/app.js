@@ -1,5 +1,3 @@
-
-
 import { ethers } from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.min.js";
 
 // 1. KONFIGURASI
@@ -57,7 +55,10 @@ async function connectWallet() {
 
 // 3. FUNGSI KIRIM PESAN (GRATIS - gas dibayar oleh sponsor)
 async function sendMessage() {
+    const title = document.getElementById("titleInput").value;
     const text = document.getElementById("messageInput").value;
+    
+    if (!title) return alert("Judul tidak boleh kosong!");
     if (!text) return alert("Pesan tidak boleh kosong!");
     if (!contract) return alert("Hubungkan wallet dulu!");
 
@@ -66,9 +67,11 @@ async function sendMessage() {
         document.getElementById("sendButton").disabled = true;
 
         // Kirim transaksi menggunakan sponsor wallet (GRATIS untuk user!)
-        const tx = await contract.postMessage(text);
+        const fullMessage = `[${title}] ${text}`;
+        const tx = await contract.postMessage(fullMessage);
         await tx.wait();
 
+        document.getElementById("titleInput").value = "";
         document.getElementById("messageInput").value = "";
         document.getElementById("sendButton").innerText = "✓ TRANSMIT TO NETWORK >";
         document.getElementById("sendButton").disabled = false;
@@ -131,23 +134,56 @@ async function loadMessages() {
         reversedMessages.forEach((msg, index) => {
             const timestamp = Number(msg.timestamp);
             const date = new Date(timestamp * 1000).toLocaleString('id-ID');
+            
+            // Parse title dari pesan (format: [title] content)
+            const textMatch = msg.text.match(/^\[(.*?)\]\s*(.*)/);
+            const title = textMatch ? textMatch[1] : "No Title";
+            const content = textMatch ? textMatch[2] : msg.text;
+            
             const div = document.createElement("div");
-            div.className = "message-item p-6 rounded-lg mb-4";
+            div.className = "message-item mb-4 accordion-item";
             div.style.animationDelay = `${index * 0.1}s`;
-            div.innerHTML = `
-                <div class="flex items-center justify-between mb-2">
-                    <p class="text-sm font-mono" style="color: var(--neon-blue);">
-                        <i class="fas fa-user-circle mr-2"></i>
-                        ${msg.sender.substring(0, 6)}...${msg.sender.substring(38)}
-                    </p>
-                    <span class="text-[10px] font-mono text-gray-500">
-                        <i class="fas fa-clock mr-1"></i>${date}
+            
+            // Header (selalu terlihat)
+            const header = document.createElement("div");
+            header.className = "accordion-header p-4 rounded-lg cursor-pointer flex items-center justify-between transition-all hover:scale-102";
+            header.innerHTML = `
+                <div class="flex items-center gap-3 flex-1">
+                    <span class="accordion-toggle transition-transform">
+                        <i class="fas fa-chevron-right"></i>
                     </span>
+                    <span class="text-lg font-semibold text-white">${title}</span>
                 </div>
-                <p class="text-lg text-white mt-2">${msg.text}</p>
+                <span class="text-[10px] font-mono text-gray-500 flex-shrink-0">
+                    <i class="fas fa-clock mr-1"></i>${date}
+                </span>
             `;
+            
+            // Content (tersembunyi awalnya)
+            const contentDiv = document.createElement("div");
+            contentDiv.className = "accordion-content hidden";
+            contentDiv.innerHTML = `
+                <div class="p-4 border-t border-gray-700">
+                    <div class="flex items-center gap-2 mb-3 pb-3 border-b border-gray-700">
+                        <p class="text-sm font-mono" style="color: var(--neon-blue);">
+                            <i class="fas fa-user-circle mr-2"></i>
+                            ${msg.sender.substring(0, 6)}...${msg.sender.substring(38)}
+                        </p>
+                    </div>
+                    <p class="text-gray-300 leading-relaxed">${content}</p>
+                </div>
+            `;
+            
+            // Event listener untuk toggle
+            header.addEventListener("click", () => {
+                contentDiv.classList.toggle("hidden");
+                header.querySelector(".accordion-toggle").classList.toggle("rotate-90");
+            });
+            
+            div.appendChild(header);
+            div.appendChild(contentDiv);
             list.appendChild(div);
-            console.log(`📝 Message ${index + 1}: "${msg.text}" from ${msg.sender}`);
+            console.log(`📝 Message ${index + 1}: Title="${title}" from ${msg.sender}`);
         });
 
         console.log(`✅ Displayed ${messages.length} messages`);
@@ -173,8 +209,15 @@ function showNotification(message) {
 }
 
 // Event Listeners
+// Event Listeners utama
 document.getElementById("connectButton").onclick = connectWallet;
 document.getElementById("sendButton").onclick = sendMessage;
+
+// Navigasi ke feed
+document.getElementById("feedButton").onclick = () => {
+    window.location.href = "feed.html";
+};
+
 
 // Auto-connect jika sudah ada provider
 window.addEventListener("load", () => {

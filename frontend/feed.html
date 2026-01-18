@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>IMMUTABLE Feed</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+  <!-- JS -->
+  <script type="module" src="feed.js"></script>
+
+  <style>
+    body {
+      background: radial-gradient(circle at top, #12001f, #000);
+    }
+
+    .glass {
+      backdrop-filter: blur(14px);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .glow {
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.25);
+    }
+
+    .like-pop {
+      animation: pop 0.25s ease-out;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.9); }
+      60% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+
+    .copy-toast {
+      opacity: 0;
+      transform: translateY(4px);
+      transition: all 0.25s ease;
+    }
+
+    .copy-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body class="bg-black text-white">
+
+<!-- TOP BAR -->
+<header class="sticky top-0 z-50 bg-black border-b border-gray-800">
+  <div class="max-w-md mx-auto flex items-center justify-between px-4 py-3">
+    <button onclick="history.back()" class="text-lg">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+
+    <h1 class="font-semibold tracking-wide">IMMUTABLE</h1>
+
+    <i class="fas fa-bolt text-purple-500"></i>
+  </div>
+</header>
+
+<!-- ACTIVE ACCOUNT BAR -->
+<section class="sticky top-12 z-40 bg-black border-b border-gray-800">
+  <div class="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
+
+    <img id="activeAvatar"
+         class="w-11 h-11 rounded-full bg-black ring-2 ring-purple-500">
+
+    <div class="flex-1 relative">
+      <p id="activeAddress"
+         class="text-sm font-mono text-purple-400 cursor-pointer relative inline-block">
+        Connecting...
+        <span id="copyToast"
+              class="copy-toast absolute -top-6 left-0 text-[10px] px-2 py-1 rounded bg-green-400 text-black font-bold">
+          Copied!
+        </span>
+      </p>
+
+      <p class="text-xs text-gray-500">
+        Connected • Sepolia Testnet
+      </p>
+    </div>
+
+    <span class="text-[10px] px-2 py-1 rounded-full bg-green-400 text-black font-bold">
+      ACTIVE
+    </span>
+  </div>
+</section>
+
+<!-- FEED -->
+<main id="feedList" class="max-w-md mx-auto pb-20">
+  <p class="text-center text-gray-500 mt-10 text-sm font-mono">
+    Loading immutable feed...
+  </p>
+</main>
+
+</body>
+</html>
