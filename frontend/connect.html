@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Public Wall of Records | Immutable Guestbook</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&family=JetBrains+Mono&display=swap"
+        rel="stylesheet" />
+
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
+            --neon-pink: #ff2a6d;
+            --dark-bg: #05070a;
+            --cyber-green: #39ff14;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--dark-bg);
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .cyber-grid {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 242, 255, .05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(188, 19, 254, .05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: grid-scroll 20s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes grid-scroll {
+            to {
+                transform: translateY(50px);
+            }
+        }
+
+        .bg-orb {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            filter: blur(150px);
+            opacity: .15;
+            z-index: 0;
+        }
+
+        .orb-1 {
+            background: var(--neon-blue);
+            top: 10%;
+            left: 10%;
+        }
+
+        .orb-2 {
+            background: var(--neon-purple);
+            bottom: 10%;
+            right: 10%;
+        }
+
+        .cyber-header {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 6px;
+            position: relative;
+        }
+
+        .btn-cyber {
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 16px 48px;
+            letter-spacing: 4px;
+            transition: .3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-cyber:hover {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 30px var(--neon-blue);
+        }
+
+        .wallet-display {
+            font-family: 'JetBrains Mono', monospace;
+            border: 1px solid var(--neon-blue);
+            padding: 10px 20px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .modal-box {
+            background: #05070a;
+            border: 2px solid var(--neon-blue);
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 420px;
+        }
+
+        .cyber-input {
+            width: 100%;
+            background: black;
+            border: 2px solid var(--neon-blue);
+            padding: 10px;
+            color: var(--neon-blue);
+            font-family: 'JetBrains Mono', monospace;
+            margin-top: 12px;
+        }
+
+        .error {
+            color: #ff4d4d;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cyber-grid"></div>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <section class="relative z-10 min-h-screen flex flex-col items-center justify-center text-center px-6">
+
+        <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[28rem] h-[28rem] 
+               bg-cyan-500/5 rounded-full blur-[180px] animate-pulse">
+        </div>
+
+        <div class="mb-10 inline-block relative">
+            <div class="relative hologram">
+                <i class="fas fa-shield-alt text-7xl icon-glow" style="color: var(--neon-blue);"></i>
+
+                <div class="absolute inset-0 text-7xl blur-xl opacity-50" style="color: var(--neon-purple);">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+            </div>
+        </div>
+
+        <h1 class="text-6xl md:text-6xl font-bold mb-6 tracking-tighter leading-none">
+            <span class="cyber-header" data-text="IMMUTABLE">
+                Public Wall of Records
+            </span>
+            <br>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r 
+                   from-cyan-400 via-purple-500 to-pink-500" style="animation: gradient-rotate 5s ease infinite;
+                   background-size: 200% 200%;">
+                Immutable Guestbook
+            </span>
+        </h1>
+
+        <p class="font-mono text-xs tracking-[0.45em] uppercase opacity-70 mb-12">
+            Decentralized • Trustless • Permanent
+        </p>
+
+        <div class="flex items-center justify-center space-x-3 mb-16">
+            <span class="inline-block w-3 h-3 rounded-full status-pulse" style="background: var(--cyber-green);"></span>
+
+            <p class="font-mono text-xs tracking-[0.4em] uppercase" style="color: var(--cyber-green);">
+                <i class="fas fa-link mr-2"></i>
+                Ledger Nodes Online
+            </p>
+
+            <span class="inline-block w-3 h-3 rounded-full status-pulse" style="background: var(--cyber-green);"></span>
+        </div>
+
+        <button id="connectWalletBtn" class="btn-cyber px-16 py-5 rounded-md text-sm font-bold shadow-2xl group">
+            <span class="relative z-10 flex items-center justify-center gap-4">
+                <i class="fas fa-plug group-hover:rotate-180 transition-transform duration-500"></i>
+                <span class="loading-dots">CONNECT WALLET</span>
+            </span>
+        </button>
+
+        <div id="walletAddress" class="wallet-display hidden mt-8 px-8 py-3 rounded-md 
+                text-xs tracking-widest">
+        </div>
+
+    </section>
+
+    <div class="modal" id="walletInfoModal">
+        <div class="modal-box text-center">
+            <i class="fas fa-info-circle text-4xl mb-4" style="color: var(--neon-blue)"></i>
+            <h3 class="cyber-header text-xl mb-3">WALLET CONNECTED</h3>
+            <p class="text-sm opacity-70 mb-6">
+                Wallet Anda telah berhasil terhubung.
+                Untuk mengakses <strong>Public Wall of Records</strong>, Anda harus membuat <strong>alias</strong>.
+                Alias ini akan digunakan sebagai nama samaran Anda di website dan <strong>tidak dapat diubah</strong>.
+            </p>
+            <button id="proceedAliasBtn" class="btn-cyber w-full">BUAT ALIAS</button>
+        </div>
+    </div>
+
+    <div class="modal" id="aliasModal">
+        <div class="modal-box">
+            <h3 class="cyber-header text-xl mb-4">CREATE ALIAS</h3>
+            <p class="text-sm opacity-70 mb-2">
+                Alias ini akan menjadi nama samaran Anda di website.
+                <strong>Hanya bisa dibuat sekali dan tidak dapat diubah.</strong>
+            </p>
+            <p class="text-xs opacity-60 mb-4 text-red-500">
+                ⚠️ Jangan masukkan nama asli atau informasi pribadi.
+                Website tidak bertanggung jawab atas penggunaan alias Anda.
+            </p>
+
+            <input id="aliasInput" class="cyber-input" placeholder="alias kamu" />
+            <div id="aliasError" class="error"></div>
+
+            <button id="saveAlias" class="btn-cyber w-full mt-6">SAVE ALIAS</button>
+        </div>
+    </div>
+
+    <div class="modal" id="connectedModal">
+        <div class="modal-box text-center">
+            <i class="fas fa-check-circle text-4xl mb-4" style="color:var(--cyber-green)"></i>
+            <h3 class="cyber-header text-xl mb-3">CONNECTION ESTABLISHED</h3>
+            <p class="text-sm opacity-70 mb-6">Akun Anda telah terkoneksi dan terverifikasi.</p>
+            <button id="continueBtn" class="btn-cyber w-full">ENTER GUESTBOOK</button>
+        </div>
+    </div>
+
+    <script type="module">
+        const contractAddress = "0x2b81C9107d72ad64D753F3B7633375698d30b61f"; // ganti dengan kontrakmu
+        const abi = [
+            "function setAlias(string _alias) external",
+            "function getAlias(address user) external view returns (string)"
+        ];
+
+        let provider, signer, contract;
+
+        async function initContract() {
+            provider = new ethers.BrowserProvider(window.ethereum);
+            signer = await provider.getSigner();
+            contract = new ethers.Contract(contractAddress, abi, signer);
+        }
+
+        import { ethers } from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.min.js";
+
+        const connectBtn = document.getElementById("connectWalletBtn");
+        const walletDisplay = document.getElementById("walletAddress");
+        const aliasModal = document.getElementById("aliasModal");
+        const connectedModal = document.getElementById("connectedModal");
+        const aliasInput = document.getElementById("aliasInput");
+        const aliasError = document.getElementById("aliasError");
+        const saveAlias = document.getElementById("saveAlias");
+        const continueBtn = document.getElementById("continueBtn");
+
+        let currentWallet = null;
+
+        connectBtn.onclick = async () => {
+            if (!window.ethereum) return alert("MetaMask tidak terdeteksi");
+
+            try {
+                const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                if (!accounts || accounts.length === 0) return alert("❌ Wallet belum terhubung");
+
+                currentWallet = accounts[0].toLowerCase();
+
+                walletDisplay.textContent = currentWallet.slice(0, 6) + "..." + currentWallet.slice(-4);
+                walletDisplay.style.display = "block";
+
+                await initContract();
+
+                const alias = await contract.getAlias(currentWallet);
+                if (alias && alias.length > 0) {
+                    connectedModal.style.display = "flex";
+                } else {
+                    document.getElementById("walletInfoModal").style.display = "flex";
+                }
+            } catch (err) {
+                console.error(err);
+                alert("❌ Koneksi gagal atau dibatalkan MetaMask");
+            }
+        };
+
+
+        document.getElementById("proceedAliasBtn").onclick = () => {
+            document.getElementById("walletInfoModal").style.display = "none";
+            aliasModal.style.display = "flex";
+        };
+
+        aliasInput.addEventListener("input", () => {
+            aliasError.textContent = "";
+        });
+
+        const bannedWords = [
+            "anjing", "bangsat", "babi", "kontol", "memek", "jancuk", "tolol", "idiot", "bodoh", "goblok", "brengsek", "kampret", "monyet", "bego", "gila", "sialan",
+            "porno", "sex", "seks", "ngentot", "masturbasi", "vagina", "penis", "bokep", "video porno", "ngemut", "hot", "bdsm", "fetish", "nude",
+            "jelek", "payah", "tidakberguna", "mampus", "mati", "kurangajar", "sampah", "rasial", "suku", "agama", "kafir", "muslim", "nasrani", "pribumi", "nonpribumi",
+            "minoritas", "hitler", "nazis", "teroris", "jihad", "islamofobia", "antisemit", "sundal", "pelacur", "bajingan", "busuk"
+        ];
+
+        function normalizeAlias(alias) {
+            return alias.toLowerCase()
+                .replace(/0/g, 'o')
+                .replace(/1/g, 'i')
+                .replace(/3/g, 'e')
+                .replace(/4/g, 'a')
+                .replace(/5/g, 's')
+                .replace(/7/g, 't')
+                .replace(/8/g, 'b')
+                .replace(/9/g, 'g')
+                .replace(/[^a-z]/g, '');
+        }
+
+        function isAliasValid(alias) {
+            const cleanAlias = normalizeAlias(alias);
+            return !bannedWords.some(word => cleanAlias.includes(word));
+        }
+
+        saveAlias.onclick = async () => {
+            const alias = aliasInput.value.trim();
+            if (alias.length < 3) {
+                return aliasError.textContent = "Alias minimal 3 karakter";
+            }
+            if (!isAliasValid(alias)) {
+                return aliasError.textContent = "Alias mengandung kata yang tidak diperbolehkan!";
+            }
+
+            try {
+                await initContract();
+
+                const tx = await contract.setAlias(alias);
+                await tx.wait(); // tunggu transaksi selesai
+
+                alert("✅ Alias berhasil tersimpan di blockchain!");
+                window.location.href = "index.html";
+            } catch (err) {
+                console.error(err);
+                aliasError.textContent = "Gagal menyimpan alias. Pastikan wallet terhubung dan belum membuat alias sebelumnya.";
+            }
+        };
+
+        continueBtn.onclick = () => window.location.href = "index.html";
+    </script>
+
+</body>
+
+</html>

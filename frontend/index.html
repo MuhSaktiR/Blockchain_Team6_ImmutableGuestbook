@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Immutable Wall | Quantum Ledger</title>
+    <title>Public Wall of Records | Immutable Guestbook</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link
@@ -551,6 +551,7 @@
                 opacity: 0;
                 max-height: 0;
             }
+
             to {
                 opacity: 1;
                 max-height: 500px;
@@ -562,6 +563,7 @@
                 opacity: 1;
                 max-height: 500px;
             }
+
             to {
                 opacity: 0;
                 max-height: 0;
@@ -578,6 +580,7 @@
             from {
                 opacity: 0;
             }
+
             to {
                 opacity: 1;
             }
@@ -587,6 +590,7 @@
             from {
                 opacity: 1;
             }
+
             to {
                 opacity: 0;
             }
@@ -597,6 +601,7 @@
                 opacity: 0;
                 transform: translateY(50px) scale(0.95);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
@@ -608,15 +613,116 @@
                 opacity: 1;
                 transform: translateY(0) scale(1);
             }
+
             to {
                 opacity: 0;
                 transform: translateY(50px) scale(0.95);
             }
         }
+
+        @keyframes glitch {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            20% {
+                transform: translate(-1px, 1px);
+            }
+
+            40% {
+                transform: translate(1px, -1px);
+            }
+
+            60% {
+                transform: translate(-1px, -1px);
+            }
+
+            80% {
+                transform: translate(1px, 1px);
+            }
+
+            100% {
+                transform: translate(0, 0);
+            }
+        }
     </style>
 </head>
 
+<!-- CYBER LOGOUT MODAL -->
+<div id="logoutModal" class="fixed inset-0 hidden items-center justify-center z-[999]
+            bg-black/80 backdrop-blur-sm">
+
+    <div class="bg-[#05070a] border-2 border-cyan-400 rounded-xl p-8 w-[90%] max-w-md
+              shadow-[0_0_40px_rgba(0,242,255,0.4)] text-center">
+
+        <i class="fas fa-triangle-exclamation text-5xl mb-4 text-cyan-400 animate-pulse"></i>
+
+        <h2 class="cyber-header text-xl mb-2 tracking-widest">
+            SESSION TERMINATED
+        </h2>
+
+        <p id="logoutMessage" class="text-sm opacity-80 mb-6 leading-relaxed">
+            Akun Anda telah keluar.
+        </p>
+
+        <button id="logoutConfirmBtn" class="btn-cyber w-full py-4 text-sm tracking-[0.3em]">
+            RETURN TO CONNECT
+        </button>
+    </div>
+</div>
+
+
 <body class="antialiased pb-20">
+    <!-- LOGOUT BUTTON (TOP RIGHT) -->
+    <div class="fixed top-5 right-6 z-50">
+        <button id="logoutBtn" class="flex items-center gap-2 px-4 py-2 border border-red-500/40
+           bg-black/60 backdrop-blur-md rounded-md
+           text-red-400 tracking-[0.3em] text-xs font-mono
+           hover:text-red-300 hover:border-red-400
+           transition-all duration-300 relative group overflow-hidden">
+
+            <!-- Glitch overlay -->
+            <span class="absolute inset-0 bg-gradient-to-r from-transparent via-red-500/10 to-transparent
+                 opacity-0 group-hover:opacity-100 animate-[glitch_0.6s_steps(2)_infinite]"></span>
+
+            <!-- Heroicon -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 group-hover:translate-x-1 transition-transform"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18 12H9m0 0l3-3m-3 3l3 3" />
+            </svg>
+
+            <span class="relative z-10">LOGOUT</span>
+        </button>
+    </div>
+
+    <script>
+        const logoutBtn = document.getElementById("logoutBtn");
+        const logoutModal = document.getElementById("logoutModal");
+        const logoutConfirmBtn = document.getElementById("logoutConfirmBtn");
+
+        logoutBtn?.addEventListener("click", () => {
+            logoutModal.classList.remove("hidden");
+            logoutModal.classList.add("flex");
+        });
+
+        logoutConfirmBtn?.addEventListener("click", () => {
+            localStorage.removeItem("wallet");
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith("alias_")) localStorage.removeItem(key);
+            });
+            window.location.href = "connect.html";
+        });
+
+        logoutModal?.addEventListener("click", (e) => {
+            if (e.target === logoutModal) {
+                logoutModal.classList.add("hidden");
+                logoutModal.classList.remove("flex");
+            }
+        });
+    </script>
+
     <!-- Background Effects -->
     <div class="cyber-grid"></div>
     <div class="bg-orb orb-1"></div>
@@ -644,9 +750,10 @@
             </div>
 
             <!-- Main Icon -->
-            <div class="mb-8 inline-block relative">
+            <div class="mb-10 inline-block relative">
                 <div class="relative hologram">
                     <i class="fas fa-shield-alt text-7xl icon-glow" style="color: var(--neon-blue);"></i>
+
                     <div class="absolute inset-0 text-7xl blur-xl opacity-50" style="color: var(--neon-purple);">
                         <i class="fas fa-shield-alt"></i>
                     </div>
@@ -658,7 +765,7 @@
                 <span class="cyber-header" data-text="IMMUTABLE">IMMUTABLE</span><br>
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500"
                     style="animation: gradient-rotate 5s ease infinite; background-size: 200% 200%;">
-                    WALL v3.0
+                    GUESTBOOK
                 </span>
             </h1>
 
@@ -668,38 +775,44 @@
                     style="background: var(--cyber-green);"></span>
                 <p class="font-mono text-xs tracking-[0.4em] uppercase" style="color: var(--cyber-green);">
                     <i class="fas fa-link mr-2"></i>
-                    Quantum Nodes Synchronized
+                    Publi Wall of Records
                 </p>
                 <span class="inline-block w-3 h-3 rounded-full status-pulse"
                     style="background: var(--cyber-green);"></span>
             </div>
 
             <!-- Connect Button -->
-            <!-- Connect Button -->
-<div class="mt-8 flex flex-col items-center gap-6">
+            <div class="mt-8 flex flex-col items-center gap-6">
 
-    <button id="connectButton" class="btn-cyber px-16 py-5 rounded-md text-sm font-bold shadow-2xl group">
-        <span class="relative z-10 flex items-center justify-center">
-            <i class="fas fa-plug mr-3 group-hover:rotate-180 transition-transform duration-500"></i>
-            <span class="loading-dots">INITIALIZE NEURAL LINK</span>
-        </span>
-    </button>
+                <div id="aliasLabel" class="cyber-header text-3xl md:text-4xl mt-6 mb-2 tracking-[0.4em]
+                    text-transparent bg-clip-text bg-gradient-to-r
+                    from-cyan-400 via-purple-500 to-pink-500
+                    drop-shadow-[0_0_25px_rgba(188,19,254,0.8)]
+                    text-center">
+                </div>
 
-    <!-- IMMUTABLE FEED BUTTON -->
-    <button
-        id="feedButton"
-        class="px-10 py-3 rounded-md font-mono text-xs tracking-[0.3em]
-               bg-gradient-to-r from-purple-600 to-cyan-500
-               hover:from-cyan-500 hover:to-purple-600
-               transition shadow-lg shadow-purple-500/30">
-        📡 IMMUTABLE FEED
-    </button>
+                <!-- SPACER -->
+                <div class="h-6"></div>
+                
+                <button id="connectButton" class="btn-cyber px-16 py-5 rounded-md text-sm font-bold shadow-2xl group">
+                    <span class="relative z-10 flex items-center justify-center">
+                        <i class="fas fa-plug mr-3 group-hover:rotate-180 transition-transform duration-500"></i>
+                        <span class="loading-dots">INITIALIZE NEURAL LINK</span>
+                    </span>
+                </button>
 
-    <div id="walletAddress"
-        class="wallet-display hidden mt-6 px-8 py-4 rounded-md tracking-widest uppercase text-xs">
-    </div>
+                <button id="feedButton" class="px-10 py-3 rounded-md font-mono text-xs tracking-[0.3em]
+                    bg-gradient-to-r from-purple-600 to-cyan-500
+                    hover:from-cyan-500 hover:to-purple-600
+                    transition shadow-lg shadow-purple-500/30">
+                    📡 IMMUTABLE FEED
+                </button>
 
-</div>
+                <div id="walletAddress"
+                    class="wallet-display hidden mt-6 px-8 py-4 rounded-md tracking-widest uppercase text-xs">
+                </div>
+
+            </div>
         </header>
 
         <!-- Main Content -->
@@ -733,27 +846,25 @@
                     </div>
                 </div>
 
-                <!-- Input Area -->
                 <div class="relative mb-4">
-                    <label for="titleInput" class="block text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2">Judul Pesan:</label>
-                    <input id="titleInput"
-                        type="text"
-                        class="cyber-input w-full p-3 text-sm rounded-md"
-                        placeholder="// MASUKKAN JUDUL PESAN..."/>
+                    <label for="titleInput"
+                        class="block text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2">Judul Pesan:</label>
+                    <input id="titleInput" type="text" class="cyber-input w-full p-3 text-sm rounded-md"
+                        placeholder="// MASUKKAN JUDUL PESAN..." />
                 </div>
                 <div class="relative">
-                    <label for="messageInput" class="block text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2">Isi Pesan:</label>
+                    <label for="messageInput"
+                        class="block text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2">Isi Pesan:</label>
                     <textarea id="messageInput"
                         class="cyber-input w-full p-6 text-sm leading-relaxed rounded-md min-h-[140px] resize-none"
-                        placeholder="// ENTER ENCRYPTED PAYLOAD
-// Data will be immutably stored on the blockchain
-// Maximum gas efficiency protocol active..."></textarea>
+                        placeholder="// MASUKKAN PESAN TERENKRIPSI
+// Data akan disimpan permanen di blockchain
+// Protokol efisiensi gas maksimum aktif..."></textarea>
                     <div class="absolute bottom-2 right-2 text-[9px] font-mono text-gray-600">
                         <i class="fas fa-fingerprint mr-1"></i> HASH READY
                     </div>
                 </div>
 
-                <!-- Submit Button -->
                 <button id="sendButton"
                     class="w-full mt-8 btn-cyber py-6 font-bold flex items-center justify-center space-x-4 rounded-md">
                     <i class="fas fa-satellite-dish animate-pulse"></i>
@@ -761,7 +872,6 @@
                     <i class="fas fa-chevron-right"></i>
                 </button>
 
-                <!-- Info Footer -->
                 <div
                     class="mt-6 flex items-center justify-center space-x-6 text-[9px] font-mono text-gray-600 uppercase tracking-wider">
                     <span><i class="fas fa-check-circle text-green-500 mr-1"></i> Immutable</span>
@@ -770,11 +880,8 @@
                 </div>
             </section>
 
-            <!-- Messages Archive Section -->
-            <!-- Bagian arsip pesan telah dihapus sesuai permintaan -->
         </main>
 
-        <!-- Footer -->
         <footer class="mt-40 text-center opacity-20 hover:opacity-60 transition-opacity duration-500">
             <div class="mb-6 flex justify-center space-x-8 text-cyan-400 text-2xl">
                 <i class="fab fa-ethereum icon-glow"></i>
@@ -783,15 +890,32 @@
                 <i class="fas fa-infinity icon-glow"></i>
             </div>
             <p class="font-mono text-[10px] uppercase tracking-[0.8em] text-gray-600">
-                Quantum Architecture // Blockchain v3.0
+                Public Wall of Records | Immutable Guestbook | Blockchain Team 6
             </p>
             <div class="mt-2 text-[8px] font-mono text-gray-700 tracking-widest">
-                <i class="fas fa-code mr-2"></i>Powered by Decentralized Infrastructure
+                <i class="fas fa-code mr-2"></i> Matakuliah Blockchain | Universitas Muhammadiyah Yogyakarta 2026
             </div>
         </footer>
     </div>
 
     <script type="module" src="app.js"></script>
+
+    <div id="toast" class="fixed top-6 right-6 z-50 hidden max-w-sm
+         backdrop-blur-lg bg-black/70 border border-purple-500
+         text-white px-5 py-4 rounded-xl shadow-xl
+         transition-all duration-300">
+
+        <div class="flex items-start gap-3">
+            <div id="toastIcon" class="text-xl">⚠️</div>
+            <div>
+                <p id="toastTitle" class="font-semibold text-sm mb-1">
+                    Notifikasi
+                </p>
+                <p id="toastMessage" class="text-xs text-gray-300"></p>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

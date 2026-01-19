@@ -1,51 +1,69 @@
-const hre = require("hardhat");
+const { ethers } = require("hardhat");
+const fs = require("fs");
+const path = require("path");
+require("dotenv").config();
 
 async function main() {
-  console.log("\n==========================================");
-  console.log("DEPLOYING GUESTBOOK CONTRACT");
-  console.log("==========================================\n");
+  console.log("🚀 Memulai proses deployment ke Sepolia Testnet...\n");
 
-  // 1. Pastikan network
-  console.log("Network:", hre.network.name);
+  if (!process.env.ALCHEMY_API_KEY || !process.env.SEPOLIA_MNEMONIC) {
+    throw new Error("❌ Pastikan ALCHEMY_API_KEY dan SEPILIA_MNEMONIC sudah di .env");
+  }
 
-  // 2. Pastikan signer
-  const [deployer] = await hre.ethers.getSigners();
-  console.log("Deployer:", deployer.address);
+  const provider = new ethers.providers.JsonRpcProvider(
+    `https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`
+  );
 
-  const balance = await deployer.provider.getBalance(deployer.address);
-  console.log("Balance:", hre.ethers.formatEther(balance), "ETH");
+  const wallet = ethers.Wallet.fromMnemonic(process.env.SEPOLIA_MNEMONIC).connect(provider);
 
-  console.log("------------------------------------------");
+  console.log("👤 Alamat Deployer :", wallet.address);
 
-  // 3. Deploy dengan GAS EXPLICIT
-  const Guestbook = await hre.ethers.getContractFactory("Guestbook");
-  const guestbook = await Guestbook.deploy({
-    gasLimit: 3_000_000,
-    maxFeePerGas: hre.ethers.parseUnits("30", "gwei"),
-    maxPriorityFeePerGas: hre.ethers.parseUnits("2", "gwei"),
-  });
+  const balance = await wallet.getBalance();
+  console.log("💰 Saldo Deployer  :", ethers.utils.formatEther(balance), "ETH");
 
-  console.log("📨 TX hash:", guestbook.deploymentTransaction().hash);
-  console.log("⏳ Waiting for confirmation...");
+  if (balance.lt(ethers.utils.parseEther("0.01"))) {
+    console.warn("⚠️  Saldo rendah, gas mungkin tidak cukup!");
+  }
 
-  await guestbook.waitForDeployment();
+  console.log("\n⏳ Menyiapkan kontrak Guestbook...");
 
-  const contractAddress = await guestbook.getAddress();
+  const Guestbook = await ethers.getContractFactory("Guestbook", wallet);
 
-  console.log("\n✅ Guestbook deployed to:", contractAddress);
-  console.log("\n==========================================");
-  console.log("PENTING: Update alamat contract di app.js");
-  console.log("==========================================");
-  console.log(`const contractAddress = "${contractAddress}";`);
-  console.log("==========================================\n");
+  const guestbook = await Guestbook.deploy();
 
-  // 4. Simpan ke file
-  const fs = require("fs");
-  fs.writeFileSync("deployed-address.txt", contractAddress);
-  console.log("Alamat contract disimpan di: deployed-address.txt");
+  console.log("📨 Hash Transaksi Deploy :", guestbook.deployTransaction.hash);
+  console.log("⏳ Menunggu konfirmasi deployment...");
+
+  await guestbook.deployed();
+
+  const contractAddress = guestbook.address;
+
+  console.log("\n✅ Smart contract berhasil di-deploy!");
+  console.log("📍 Alamat Kontrak   :", contractAddress);
+  console.log("🌐 Network          : Sepolia Testnet");
+  console.log("🔗 Chain ID         : 11155111");
+
+  const filePath = path.join(__dirname, "..", "deployed-address.txt");
+  fs.writeFileSync(filePath, contractAddress, "utf8");
+  console.log("💾 Alamat kontrak disimpan ke deployed-address.txt");
+
+  const code = await provider.getCode(contractAddress);
+  console.log("📦 Bytecode Terpasang :", code.length > 10 ? "✅ YA" : "❌ TIDAK");
+
+  console.log("\n🎉 Deployment selesai dengan sukses!");
+  console.log("👉 Jangan lupa update contractAddress di frontend:", contractAddress);
 }
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error("\n❌ TERJADI KESALAHAN SAAT DEPLOY:");
+    console.error(error);
 
-main().catch((error) => {
-  console.error("DEPLOY ERROR:", error);
-  process.exit(1);
-});
+    console.error("\n🔍 Kemungkinan penyebab:");
+    console.error("1. Saldo Sepolia ETH tidak mencukupi");
+    console.error("2. ALCHEMY_API_KEY salah atau belum diisi");
+    console.error("3. MNEMONIC salah atau belum diisi");
+    console.error("4. Koneksi internet bermasalah");
+
+    process.exit(1);
+  });

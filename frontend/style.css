@@ -2,7 +2,6 @@ body {
     font-family: 'Inter', sans-serif;
 }
 
-/* Animasi saat pesan baru muncul */
 .message-item {
     animation: fadeIn 0.5s ease-in-out;
 }

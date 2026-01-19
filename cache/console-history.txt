@@ -1,0 +1,2 @@
+const contract = await deploy.deploy();
+const contract = await Guestbook.deploy();
